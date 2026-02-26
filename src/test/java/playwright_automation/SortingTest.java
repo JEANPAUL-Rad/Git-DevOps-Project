@@ -41,14 +41,11 @@ public class SortingTest {
     @Test
     public void verifyPriceLowToHighSorting() {
         page.navigate("https://practicesoftwaretesting.com/");
-        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        page.waitForLoadState(LoadState.NETWORKIDLE);
 
-        Locator sortDropdown = page.locator("select[data-test='sort']");
-        sortDropdown.waitFor();
+        page.locator("select[data-test='sort']").waitFor();
 
-        sortDropdown.selectOption("price,asc");
-
-        page.locator(".price").first().waitFor();
+        page.selectOption("select[data-test='sort']", "price,asc");
 
         List<String> priceTexts = page.locator(".price").allTextContents();
 
