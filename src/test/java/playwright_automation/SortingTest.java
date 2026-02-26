@@ -1,6 +1,7 @@
 package playwright_automation;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.LoadState;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -40,9 +41,11 @@ public class SortingTest {
     @Test
     public void verifyPriceLowToHighSorting() {
         page.navigate("https://practicesoftwaretesting.com/");
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+
+        page.locator("select[data-test='sort']").waitFor();
 
         page.selectOption("select[data-test='sort']", "price,asc");
-        page.waitForTimeout(2000);
 
         List<String> priceTexts = page.locator(".price").allTextContents();
 
