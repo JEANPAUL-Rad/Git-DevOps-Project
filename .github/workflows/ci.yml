@@ -22,5 +22,11 @@ jobs:
       - name: Install Playwright Browsers
         run: mvn exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps chromium" -Dexec.classpathScope=test
 
+      - name: Check site reachability
+        run: |
+          curl -v --max-time 30 https://practicesoftwaretesting.com/ || echo "Site may be slow"
+
       - name: Run Tests
-        run: mvn clean test -Dsurefire.timeout=120
+        run: mvn clean test -Dsurefire.timeout=180
+        env:
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: ""
