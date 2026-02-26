@@ -5,7 +5,7 @@ public class test {
         int c = a+b;
         System.out.println(c);
 
-        //verifying stash if its works
+        //verifying conflict if its mine new test conflict
 
 
     }
