@@ -18,13 +18,16 @@ public class SortingTest {
     @BeforeAll
     static void launchBrowser() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+        browser = playwright.chromium().launch(
+                new BrowserType.LaunchOptions().setHeadless(true)
+        );
     }
 
     @BeforeEach
     void createContextAndPage() {
         context = browser.newContext();
         page = context.newPage();
+        page.setDefaultTimeout(60000);
     }
 
     @AfterEach
@@ -41,13 +44,24 @@ public class SortingTest {
     @Test
     public void verifyPriceLowToHighSorting() {
         page.navigate("https://practicesoftwaretesting.com/");
-        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
 
-        page.locator("select[data-test='sort']").waitFor();
+        page.locator("[data-test='sort']").waitFor();
+        page.locator("[data-test='product-price']").first().waitFor();
 
-        page.selectOption("select[data-test='sort']", "price,asc");
+        String firstPriceBefore = page.locator("[data-test='product-price']")
+                .first().innerText();
 
-        List<String> priceTexts = page.locator(".price").allTextContents();
+        page.selectOption("[data-test='sort']", "price,asc");
+
+        page.waitForFunction(
+                "oldPrice => document.querySelector('[data-test=\"product-price\"]')" +
+                        ".innerText !== oldPrice",
+                firstPriceBefore
+        );
+
+        page.locator("[data-test='product-price']").first().waitFor();
+        List<String> priceTexts = page.locator("[data-test='product-price']").allTextContents();
 
         List<Double> prices = new ArrayList<>();
         for (String price : priceTexts) {
@@ -57,6 +71,6 @@ public class SortingTest {
         List<Double> sortedPrices = new ArrayList<>(prices);
         Collections.sort(sortedPrices);
 
-        assertEquals(sortedPrices, prices, "Products are not sorted correctly!");
+        assertEquals(sortedPrices, prices, "Products are not sorted Low to High correctly!");
     }
 }
