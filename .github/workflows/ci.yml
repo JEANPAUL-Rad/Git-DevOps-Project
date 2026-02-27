@@ -1,0 +1,32 @@
+name: Playwright Java CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Install Playwright Browsers
+        run: mvn exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps chromium" -Dexec.classpathScope=test
+
+      - name: Check site reachability
+        run: |
+          curl -v --max-time 30 https://practicesoftwaretesting.com/ || echo "Site may be slow"
+
+      - name: Run Tests
+        run: mvn clean test -Dsurefire.timeout=180
+        env:
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: ""
